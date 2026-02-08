@@ -194,11 +194,13 @@
             left: 0;
             width: 100%;
             height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
+            /* justify-content: center; REMOVED for safe centering */
+            padding: 40px 20px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -265,9 +267,20 @@
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
             border-radius: 28px;
-            padding: 2.5rem 2rem;
+
+            /* Responsive Sizing Fixes */
             width: 100%;
-            max-width: 440px;
+            max-width: 420px;
+            padding: 24px;
+            margin: auto;
+
+            /* Flex Layout for Balance */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+
             text-align: center;
             position: relative;
         }
@@ -283,9 +296,18 @@
                 0 20px 40px rgba(0, 0, 0, 0.05),
                 inset 0 0 20px rgba(255, 255, 255, 0.5);
             border-radius: 32px;
-            padding: 3rem 2rem;
+
+            /* Sizing */
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
+            padding: 32px 24px;
+            margin: auto;
+
+            /* Layout */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
             text-align: center;
             transform: translateY(0);
             animation: float-panel 8s ease-in-out infinite;
@@ -405,9 +427,13 @@
 
         .btn-group {
             display: flex;
-            gap: 15px;
+            gap: 16px;
+            flex-wrap: wrap;
+            /* Allows wrapping on tiny screens */
             justify-content: center;
-            margin-top: 1rem;
+            align-items: center;
+            margin-top: 1.5rem;
+            width: 100%;
         }
 
         /* 
@@ -422,6 +448,11 @@
         .reveal-up.active {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* UTILITIES */
+        .hidden {
+            display: none !important;
         }
 
         /* Toast Message */
@@ -444,9 +475,25 @@
             white-space: nowrap;
         }
 
-        #toast-message.show {
+        /* Final Memory Image (Page 4) */
+        .final-memory {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            border-radius: 20px;
+            margin-top: 1.5rem;
+            box-shadow: 0 10px 40px rgba(255, 183, 197, 0.4);
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+            transition: opacity 2s ease, transform 2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .final-memory.active {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: scale(1) translateY(0);
         }
 
         /* Confetti */
@@ -633,9 +680,16 @@
                     <button class="btn btn-secondary" onclick="handleThink()">🙈 Think again</button>
                 </div>
 
-                <div id="success-message" class="hidden" style="margin-top: 2rem;">
-                    <p class="calligraphy-text active" style="font-size: 2.5rem; opacity: 1;">I knew it 💗</p>
-                    <p style="font-size: 1.2rem;">Happy Propose Day!</p>
+                <div id="success-message" class="hidden" style="margin-top: 1rem;">
+                    <!-- Text First -->
+                    <p class="calligraphy-text" style="font-size: 2.2rem; opacity: 0; transition: opacity 1s ease;">I
+                        knew it 💗</p>
+                    <p style="font-size: 1.1rem; opacity: 0; transition: opacity 1s ease 0.5s;">Happy Propose Day! 💍
+                    </p>
+
+                    <!-- Emotional Memory Reveal -->
+                    <img src="assets/final-us.jpg" alt="Our Memory" class="final-memory" id="final-image"
+                        onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('beforeend', '<p style=\'color: #d66d75; font-size: 0.8rem; margin-top: 10px;\'>⚠️ Save your photo as <b>assets/final-us.jpg</b></p>');">
                 </div>
             </div>
         </section>
@@ -872,13 +926,26 @@
             // Hide buttons
             document.querySelector('#page4 .btn-group').style.display = 'none';
 
-            // Show Success
+            // Show Success Container
             const successMsg = document.getElementById('success-message');
             successMsg.classList.remove('hidden');
 
-            // Animations
+            // 1. Text Animation
             const texts = successMsg.querySelectorAll('p');
-            texts.forEach(t => t.classList.add('reveal-up', 'active'));
+            requestAnimationFrame(() => {
+                texts.forEach(t => t.style.opacity = '1');
+            });
+
+            // 2. Final Memory Reveal (Short Pause)
+            setTimeout(() => {
+                const finalImg = document.getElementById('final-image');
+                finalImg.classList.add('active');
+
+                // Volume swell (optional)
+                if (isMusicPlaying && audio.volume < 0.8) {
+                    audio.volume = Math.min(audio.volume + 0.2, 0.8);
+                }
+            }, 1500);
 
             createConfettiLoop();
         }
