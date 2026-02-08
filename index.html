@@ -399,6 +399,12 @@
             background: rgba(255, 255, 255, 0.7);
             color: #888;
             box-shadow: none;
+            /* Ensure interactivity */
+            position: relative;
+            z-index: 20;
+            cursor: pointer;
+            pointer-events: auto;
+            touch-action: manipulation;
         }
 
         .btn-secondary:hover {
@@ -677,7 +683,7 @@
 
                 <div class="btn-group">
                     <button class="btn" onclick="handleYes()">💖 Yes</button>
-                    <button class="btn btn-secondary" onclick="handleThink()">🙈 Think again</button>
+                    <button class="btn btn-secondary" onclick="handleThink(this)">🙈 Think again</button>
                 </div>
 
                 <div id="success-message" class="hidden" style="margin-top: 1rem;">
@@ -916,10 +922,28 @@
         }
 
         // --- PAGE 4 INTERACTION ---
-        function handleThink() {
+        function handleThink(btn) {
+            // 1. Show Toast
             const toast = document.getElementById('toast-message');
+            toast.innerHTML = "<b>404 Error:</b> Rejection not found! 🥺";
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+
+            // Clear previous timeout if any to prevent cutting off
+            if (toast.timeoutId) clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => toast.classList.remove('show'), 3000);
+
+            // 2. Playful Dodge Effect
+            if (btn) {
+                // Random movement range (-80px to 80px)
+                const x = (Math.random() - 0.5) * 160;
+                const y = (Math.random() - 0.5) * 160;
+
+                // Add rotation for extra fun
+                const rot = (Math.random() - 0.5) * 30;
+
+                btn.style.transition = "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
+                btn.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+            }
         }
 
         function handleYes() {
